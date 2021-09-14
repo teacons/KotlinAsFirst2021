@@ -137,8 +137,8 @@ fun accountInThreeYears(initial: Int, percent: Int): Double{
  */
 fun numberRevert(number: Int): Int{
     var num = number;
-    var res = num%10; num = num shr 1;
-    res = res*10 + num%10; num = num shr 1;
+    var res = num%10; num = num / 10;
+    res = res*10 + num%10; num = num / 10;
     res = res*10 + num%10;
     return res;
 }
