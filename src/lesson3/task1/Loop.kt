@@ -72,7 +72,17 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int = TODO()
+fun digitNumber(n: Int): Int {
+    if(n == 0)
+        return 1
+    var res = 0
+    var num = n
+    while (num > 0) {
+        num /= 10
+        res++
+    }
+    return res
+}
 
 /**
  * Простая (2 балла)
@@ -80,21 +90,44 @@ fun digitNumber(n: Int): Int = TODO()
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int = TODO()
+fun fib(n: Int): Int {
+    if (n == 1 || n == 2)
+        return 1
+
+    var a = 1
+    var b = 1
+    var c = 0
+    for (i in 3..n) {
+        c = a + b
+        a = b
+        b = c
+    }
+    return c
+}
 
 /**
  * Простая (2 балла)
  *
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
-fun minDivisor(n: Int): Int = TODO()
+fun minDivisor(n: Int): Int {
+    var del = 2
+    while(n % del != 0)
+        del++
+    return del
+}
 
 /**
  * Простая (2 балла)
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int = TODO()
+fun maxDivisor(n: Int): Int {
+    var del = n / 2
+    while (n % del != 0)
+        del--
+    return del
+}
 
 /**
  * Простая (2 балла)
@@ -112,7 +145,13 @@ fun maxDivisor(n: Int): Int = TODO()
  * Написать функцию, которая находит, сколько шагов требуется для
  * этого для какого-либо начального X > 0.
  */
-fun collatzSteps(x: Int): Int = TODO()
+fun collatzSteps(x: Int): Int {
+    if (x == 1)
+        return 0
+    if (x % 2 == 0)
+        return collatzSteps(x / 2) + 1
+    return collatzSteps(3 * x + 1) + 1
+}
 
 /**
  * Средняя (3 балла)
@@ -120,7 +159,19 @@ fun collatzSteps(x: Int): Int = TODO()
  * Для заданных чисел m и n найти наименьшее общее кратное, то есть,
  * минимальное число k, которое делится и на m и на n без остатка
  */
-fun lcm(m: Int, n: Int): Int = TODO()
+fun gcf(m: Int, n: Int): Int{
+    var a = m
+    var b = n
+    while (a != 0 && b != 0){
+        if(a > b)
+            a %= b
+        else
+            b %= a
+    }
+    return a + b
+}
+
+fun lcm(m: Int, n: Int): Int = m * n / gcf(m, n)
 
 /**
  * Средняя (3 балла)
@@ -129,7 +180,8 @@ fun lcm(m: Int, n: Int): Int = TODO()
  * Взаимно простые числа не имеют общих делителей, кроме 1.
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
-fun isCoPrime(m: Int, n: Int): Boolean = TODO()
+fun isCoPrime(m: Int, n: Int): Boolean =
+    gcf(m, n) == 1
 
 /**
  * Средняя (3 балла)
@@ -138,7 +190,15 @@ fun isCoPrime(m: Int, n: Int): Boolean = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun revert(n: Int): Int = TODO()
+fun revert(n: Int): Int {
+    var a = n
+    var res = 0
+    while (a > 0) {
+        res = res * 10 + a % 10
+        a /= 10
+    }
+    return res
+}
 
 /**
  * Средняя (3 балла)
@@ -149,7 +209,7 @@ fun revert(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean = TODO()
+fun isPalindrome(n: Int): Boolean = n == revert(n)
 
 /**
  * Средняя (3 балла)
@@ -159,7 +219,19 @@ fun isPalindrome(n: Int): Boolean = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun hasDifferentDigits(n: Int): Boolean = TODO()
+fun hasDifferentDigits(n: Int): Boolean {
+    var num = n
+    val lastDif = num % 10; num / 10
+    var res = false
+    while (num > 0) {
+        if (num % 10 != lastDif) {
+            res = true
+            break
+        }
+        num /= 10
+    }
+    return res
+}
 
 /**
  * Средняя (4 балла)
@@ -170,7 +242,17 @@ fun hasDifferentDigits(n: Int): Boolean = TODO()
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
-fun sin(x: Double, eps: Double): Double = TODO()
+fun sin(x: Double, eps: Double): Double {
+    var res = x
+    var i = 1
+    var member = x
+    while (member > eps) {
+        member *= x * x / ((2 * i) * (2 * i + 1))
+        i++
+        res += member * ((-0.5 + i % 2) * 2)
+    }
+    return res
+}
 
 /**
  * Средняя (4 балла)
