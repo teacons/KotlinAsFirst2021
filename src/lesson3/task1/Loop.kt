@@ -73,7 +73,7 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun digitNumber(n: Int): Int {
-    if(n == 0)
+    if (n == 0)
         return 1
     var res = 0
     var num = n
@@ -112,7 +112,7 @@ fun fib(n: Int): Int {
  */
 fun minDivisor(n: Int): Int {
     var del = 2
-    while(n % del != 0)
+    while (n % del != 0)
         del++
     return del
 }
@@ -159,11 +159,11 @@ fun collatzSteps(x: Int): Int {
  * Для заданных чисел m и n найти наименьшее общее кратное, то есть,
  * минимальное число k, которое делится и на m и на n без остатка
  */
-fun gcf(m: Int, n: Int): Int{
+fun gcf(m: Int, n: Int): Int {
     var a = m
     var b = n
-    while (a != 0 && b != 0){
-        if(a > b)
+    while (a != 0 && b != 0) {
+        if (a > b)
             a %= b
         else
             b %= a
@@ -242,7 +242,9 @@ fun hasDifferentDigits(n: Int): Boolean {
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
-fun sin(x: Double, eps: Double): Double {
+fun sin(x: Double, eps: Double): Double = TODO()
+
+/*fun sin(x: Double, eps: Double): Double {
     var res = x
     var i = 1
     var member = x
@@ -252,7 +254,7 @@ fun sin(x: Double, eps: Double): Double {
         res += member * ((-0.5 + i % 2) * 2)
     }
     return res
-}
+}*/
 
 /**
  * Средняя (4 балла)
@@ -285,4 +287,26 @@ fun squareSequenceDigit(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int = TODO()
+fun fibSequenceDigit(n: Int): Int {
+    if (n == 1 || n == 2)
+        return 1
+
+    var a = 1
+    var b = 1
+    var c = 0
+    var numCount = 2
+
+    while (numCount < n) {
+        c = a + b
+        a = b
+        b = c
+        numCount += digitNumber(c)
+    }
+
+    val searchedIndex = numCount - n
+
+    for (i in 1..searchedIndex)
+        c /= 10
+
+    return c % 10
+}
