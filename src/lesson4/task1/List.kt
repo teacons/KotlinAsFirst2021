@@ -337,7 +337,7 @@ fun russian(n: Int): String {
         "девяносто"
     )
     val irregularTens = listOf<String>(
-        ERROR_STRING,
+        "десять",
         "одинадцать",
         "двенадцать",
         "тринадцать",
@@ -392,7 +392,7 @@ fun russian(n: Int): String {
         if (secondHalf / 100 != 0)
             res += hundreds[secondHalf / 100]
 
-        if (secondHalf % 100 in 11..19)
+        if (secondHalf % 100 in 10..19)
             res += irregularTens[secondHalf % 10]
         else {
             if ((secondHalf % 100) / 10 != 0)
