@@ -338,7 +338,7 @@ fun russian(n: Int): String {
     )
     val irregularTens = listOf<String>(
         "десять",
-        "одинадцать",
+        "одиннадцать",
         "двенадцать",
         "тринадцать",
         "четырнадцать",
