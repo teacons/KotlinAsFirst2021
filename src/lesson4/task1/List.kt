@@ -372,7 +372,7 @@ fun russian(n: Int): String {
         if (firstHalf / 100 != 0)
             res += hundreds[firstHalf / 100]
 
-        if (firstHalf % 100 in 11..19)
+        if (firstHalf % 100 in 10..19)
             res += irregularTens[firstHalf % 10]
         else {
             if ((firstHalf % 100) / 10 != 0)
