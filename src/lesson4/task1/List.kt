@@ -3,6 +3,7 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
+import lesson3.task1.isPrime
 import kotlin.math.sqrt
 
 // Урок 4: списки
@@ -120,14 +121,14 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = TODO()
+fun abs(v: List<Double>): Double = sqrt(v.sumOf { it * it })
 
 /**
  * Простая (2 балла)
  *
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
-fun mean(list: List<Double>): Double = TODO()
+fun mean(list: List<Double>): Double = if (list.isEmpty()) 0.0 else list.sum() / list.size
 
 /**
  * Средняя (3 балла)
@@ -137,7 +138,14 @@ fun mean(list: List<Double>): Double = TODO()
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun center(list: MutableList<Double>): MutableList<Double> = TODO()
+fun center(list: MutableList<Double>): MutableList<Double> {
+
+    val average = mean(list)
+    for (i in 0 until list.size) {
+        list[i] -= average
+    }
+    return list
+}
 
 /**
  * Средняя (3 балла)
@@ -146,7 +154,7 @@ fun center(list: MutableList<Double>): MutableList<Double> = TODO()
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
-fun times(a: List<Int>, b: List<Int>): Int = TODO()
+fun times(a: List<Int>, b: List<Int>): Int = a.mapIndexed { index, el -> el * b[index] }.sum()
 
 /**
  * Средняя (3 балла)
@@ -156,7 +164,15 @@ fun times(a: List<Int>, b: List<Int>): Int = TODO()
  * Коэффициенты многочлена заданы списком p: (p0, p1, p2, p3, ..., pN).
  * Значение пустого многочлена равно 0 при любом x.
  */
-fun polynom(p: List<Int>, x: Int): Int = TODO()
+fun polynom(p: List<Int>, x: Int): Int {
+    val list = mutableListOf<Int>()
+    var prev = 1
+    for (i in p.indices) {
+        list.add(p[i] * prev)
+        prev *= x
+    }
+    return list.sum()
+}
 
 /**
  * Средняя (3 балла)
@@ -168,7 +184,12 @@ fun polynom(p: List<Int>, x: Int): Int = TODO()
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun accumulate(list: MutableList<Int>): MutableList<Int> = TODO()
+fun accumulate(list: MutableList<Int>): MutableList<Int> {
+    for (i in 1 until list.size) {
+        list[i] += list[i - 1]
+    }
+    return list
+}
 
 /**
  * Средняя (3 балла)
@@ -177,7 +198,32 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> = TODO()
  * Результат разложения вернуть в виде списка множителей, например 75 -> (3, 5, 5).
  * Множители в списке должны располагаться по возрастанию.
  */
-fun factorize(n: Int): List<Int> = TODO()
+fun factorize(n: Int): List<Int> {
+
+    if (isPrime(n))
+        return mutableListOf<Int>(n)
+
+    var upEdge = n
+    var div = 2
+    val res = mutableListOf<Int>()
+
+    while (upEdge % div == 0) {
+        res.add(div)
+        upEdge /= div
+    }
+    div = 3
+
+    while (upEdge > 1) {
+        if (isPrime(div))
+            while (upEdge % div == 0) {
+                res.add(div)
+                upEdge /= div
+            }
+        div += 2
+    }
+
+    return res
+}
 
 /**
  * Сложная (4 балла)
@@ -186,7 +232,7 @@ fun factorize(n: Int): List<Int> = TODO()
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String = TODO()
+fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*")
 
 /**
  * Средняя (3 балла)
@@ -243,6 +289,8 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  */
 fun roman(n: Int): String = TODO()
 
+
+const val ERROR_STRING = "Err"
 /**
  * Очень сложная (7 баллов)
  *
@@ -250,4 +298,109 @@ fun roman(n: Int): String = TODO()
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+fun russian(n: Int): String {
+
+    val ones = listOf<String>(
+        ERROR_STRING,
+        "один",
+        "два",
+        "три",
+        "четыре",
+        "пять",
+        "шесть",
+        "семь",
+        "восемь",
+        "девять",
+    )
+    val onesThousands = listOf<String>(
+        ERROR_STRING,
+        "одна",
+        "две",
+        "три",
+        "четыре",
+        "пять",
+        "шесть",
+        "семь",
+        "восемь",
+        "девять",
+    )
+    val tens = listOf<String>(
+        ERROR_STRING,
+        ERROR_STRING,
+        "двадцать",
+        "тридцать",
+        "сорок",
+        "пятьдесят",
+        "шестьдесят",
+        "семьдесят",
+        "восемьдесят",
+        "девяносто"
+    )
+    val irregularTens = listOf<String>(
+        ERROR_STRING,
+        "одинадцать",
+        "двенадцать",
+        "тринадцать",
+        "четырнадцать",
+        "пятнадцать",
+        "шестнадцать",
+        "семнадцать",
+        "восемнадцать",
+        "девятнадцать"
+    )
+    val hundreds = listOf<String>(
+        ERROR_STRING,
+        "сто",
+        "двести",
+        "триста",
+        "четыреста",
+        "пятьсот",
+        "шестьсот",
+        "семьсот",
+        "восемьсот",
+        "девятьсот",
+    )
+
+    if (n == 0)
+        return "ноль"
+
+    val res = mutableListOf<String>()
+    val firstHalf = (n / 1000)
+    val secondHalf = (n % 1000)
+
+    if (firstHalf != 0) {
+        if (firstHalf / 100 != 0)
+            res += hundreds[firstHalf / 100]
+
+        if (firstHalf % 100 in 11..19)
+            res += irregularTens[firstHalf % 10]
+        else {
+            if ((firstHalf % 100) / 10 != 0)
+                res += tens[(firstHalf % 100) / 10]
+            if (firstHalf % 10 != 0)
+                res += onesThousands[firstHalf % 10]
+        }
+        res += when {
+            firstHalf % 100 in 11..19 -> "тысяч"
+            firstHalf % 10 == 1 -> "тысяча"
+            firstHalf % 10 in 2..4 -> "тысячи"
+            else -> "тысяч"
+        }
+    }
+
+    if (secondHalf != 0) {
+        if (secondHalf / 100 != 0)
+            res += hundreds[secondHalf / 100]
+
+        if (secondHalf % 100 in 11..19)
+            res += irregularTens[secondHalf % 10]
+        else {
+            if ((secondHalf % 100) / 10 != 0)
+                res += tens[(secondHalf % 100) / 10]
+            if (secondHalf % 10 != 0)
+                res += ones[secondHalf % 10]
+        }
+    }
+
+    return res.joinToString(separator = " ")
+}
