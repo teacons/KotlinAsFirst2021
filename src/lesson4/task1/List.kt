@@ -198,31 +198,30 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> {
  * Результат разложения вернуть в виде списка множителей, например 75 -> (3, 5, 5).
  * Множители в списке должны располагаться по возрастанию.
  */
+
 fun factorize(n: Int): List<Int> {
-
-    if (isPrime(n))
-        return mutableListOf<Int>(n)
-
-    var upEdge = n
-    var div = 2
+    var num = n
     val res = mutableListOf<Int>()
-
-    while (upEdge % div == 0) {
-        res.add(div)
-        upEdge /= div
+    var div = num / 2
+    while (div > 1) {
+        if (num % div == 0) {
+            val divs = factorize(div)
+            res += divs
+            num /= div
+            continue
+        }
+        div--
     }
-    div = 3
-
-    while (upEdge > 1) {
-        if (isPrime(div))
-            while (upEdge % div == 0) {
-                res.add(div)
-                upEdge /= div
-            }
-        div += 2
+    if (res.isEmpty()) {
+        res += n
+        num /= n
     }
+//    if (res.size == 1)
+//        if (div != 1)
+//            while (num % div == 0)
+//                res += div
 
-    return res
+    return res.sorted()
 }
 
 /**

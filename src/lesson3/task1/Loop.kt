@@ -15,6 +15,9 @@ import kotlin.math.sqrt
  *
  * Вычисление факториала
  */
+
+
+
 fun factorial(n: Int): Double {
     var result = 1.0
     for (i in 1..n) {
@@ -28,15 +31,8 @@ fun factorial(n: Int): Double {
  *
  * Проверка числа на простоту -- результат true, если число простое
  */
-fun isPrime(n: Int): Boolean {
-    if (n < 2) return false
-    if (n == 2) return true
-    if (n % 2 == 0) return false
-    for (m in 3..sqrt(n.toDouble()).toInt() step 2) {
-        if (n % m == 0) return false
-    }
-    return true
-}
+fun isPrime(n: Int): Boolean =
+    n >= 2 && (2..n / 2).all { n % it != 0 }
 
 /**
  * Пример
@@ -112,10 +108,10 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    var del = 2
-    while (n % del != 0)
-        del++
-    return del
+    for (i in 2..sqrt(n.toDouble()).toInt())
+        if (n % i == 0)
+            return i
+    return n
 }
 
 /**
@@ -124,10 +120,10 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    var del = n / 2
-    while (n % del != 0)
-        del--
-    return del
+    for (i in sqrt(n.toDouble()).toInt() downTo 2)
+        if (n % i == 0)
+            return i
+    return n
 }
 
 /**
@@ -223,15 +219,12 @@ fun isPalindrome(n: Int): Boolean = n == revert(n)
 fun hasDifferentDigits(n: Int): Boolean {
     var num = n
     val lastDif = num % 10; num / 10
-    var res = false
     while (num > 0) {
-        if (num % 10 != lastDif) {
-            res = true
-            break
-        }
+        if (num % 10 != lastDif)
+            return true
         num /= 10
     }
-    return res
+    return false
 }
 
 /**
