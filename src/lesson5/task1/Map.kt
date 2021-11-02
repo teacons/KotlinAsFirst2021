@@ -229,7 +229,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean =
-    chars.toSet() == word.toSet()
+    word == "" || chars.toSet() == word.toSet()
 
 /**
  * Средняя (4 балла)
@@ -356,6 +356,9 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    if (number == 0 && list.count { it == 0 } < 2) {
+        return -1 to -1
+    }
     val set = list.map { kotlin.math.abs(number - it) }.intersect(list)
     if (set.isEmpty() ||
         set.size == 1 && list.count { it == set.first() } == 1
