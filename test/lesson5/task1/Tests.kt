@@ -309,6 +309,10 @@ class Tests {
             findSumOfTwo(listOf(1, 0, 0), 0)
         )
         assertEquals(
+            Pair(0, 1),
+            findSumOfTwo(listOf(1, 0, 0), 1)
+        )
+        assertEquals(
             Pair(-1, -1),
             findSumOfTwo(emptyList(), 1)
         )

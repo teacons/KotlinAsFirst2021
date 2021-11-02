@@ -355,22 +355,23 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    if (number == 0) {
-        return if (list.count { it == 0 } < 2) {
-            -1 to -1
-        } else {
-            list.indexOf(0) to list.subList(list.indexOf(0) + 1, list.size).indexOf(0) + list.indexOf(0) + 1
+    if (number % 2 == 0 && list.contains(number / 2)) {
+        if (list.count { it == number / 2 } >= 2) {
+            val first = list.indexOf(number / 2)
+            val second = list.subList(first + 1, list.size).indexOf(number / 2) + first + 1
+            return first to second
         }
     }
-    val checking = list.map { kotlin.math.abs(number - it) }.intersect(list).sorted()
-    if (checking.isEmpty() ||
-        checking.size == 1 && list.count { it == checking.first() } == 1
-    ) {
+    var checking = list.map { kotlin.math.abs(number - it) }.intersect(list).sorted()
+    if (checking.size <= 1) {
         return -1 to -1
     }
 
-    return list.indexOf(checking.first()) to list.subList(list.indexOf(checking.first()) + 1, list.size)
-        .indexOf(checking.last()) + list.indexOf(checking.first()) + 1
+    checking = listOf(checking.first(), checking.last())
+
+    val first = list.indexOfFirst { checking.contains(it) }
+    val second = list.subList(first + 1, list.size).indexOf((checking - list[first]).first()) + first + 1
+    return first to second
 
 }
 
