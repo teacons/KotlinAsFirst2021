@@ -3,7 +3,6 @@
 package lesson5.task1
 
 import java.lang.NullPointerException
-import java.util.Collections.max
 
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
@@ -360,17 +359,18 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
         return if (list.count { it == 0 } < 2) {
             -1 to -1
         } else {
-            list.indexOf(0) to list.subList(list.indexOf(0) + 1, list.size).indexOf(0)
+            list.indexOf(0) to list.subList(list.indexOf(0) + 1, list.size).indexOf(0) + list.indexOf(0) + 1
         }
     }
-    val set = list.map { kotlin.math.abs(number - it) }.intersect(list)
-    if (set.isEmpty() ||
-        set.size == 1 && list.count { it == set.first() } == 1
+    val checking = list.map { kotlin.math.abs(number - it) }.intersect(list).sorted()
+    if (checking.isEmpty() ||
+        checking.size == 1 && list.count { it == checking.first() } == 1
     ) {
         return -1 to -1
     }
 
-    return list.indexOf(set.first()) to list.subList(list.indexOf(set.first()) + 1, list.size).indexOf(set.last())
+    return list.indexOf(checking.first()) to list.subList(list.indexOf(checking.first()) + 1, list.size)
+        .indexOf(checking.last()) + list.indexOf(checking.first()) + 1
 
 }
 
