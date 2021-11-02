@@ -31,8 +31,15 @@ fun factorial(n: Int): Double {
  *
  * Проверка числа на простоту -- результат true, если число простое
  */
-fun isPrime(n: Int): Boolean =
-    n >= 2 && (2..n / 2).all { n % it != 0 }
+fun isPrime(n: Int): Boolean {
+    if (n < 2) return false
+    if (n == 2) return true
+    if (n % 2 == 0) return false
+    for (m in 3..sqrt(n.toDouble()).toInt() step 2) {
+        if (n % m == 0) return false
+    }
+    return true
+}
 
 /**
  * Пример
@@ -108,9 +115,11 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    for (i in 2..sqrt(n.toDouble()).toInt())
-        if (n % i == 0)
+    for (i in 2..sqrt(n.toDouble()).toInt()) {
+        if (n % i == 0) {
             return i
+        }
+    }
     return n
 }
 
@@ -120,9 +129,11 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    for (i in 2..sqrt(n.toDouble()).toInt())
-        if (n % i == 0)
+    for (i in 2..sqrt(n.toDouble()).toInt()) {
+        if (n % i == 0) {
             return n / i
+        }
+    }
     return 1
 }
 

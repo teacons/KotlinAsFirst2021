@@ -3,7 +3,6 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
-import lesson3.task1.isPrime
 import kotlin.math.sqrt
 
 // Урок 4: списки
@@ -207,8 +206,11 @@ fun factorize(n: Int): List<Int> {
         if (num % div == 0) {
             val divs = factorize(div)
             res += divs
+            if (num / div == div) {
+                res += divs
+                num /= div
+            }
             num /= div
-            continue
         }
         div--
     }
@@ -290,6 +292,67 @@ fun roman(n: Int): String = TODO()
 
 
 const val ERROR_STRING = "Err"
+val ONES_LIST = listOf<String>(
+    ERROR_STRING,
+    "один",
+    "два",
+    "три",
+    "четыре",
+    "пять",
+    "шесть",
+    "семь",
+    "восемь",
+    "девять",
+)
+val ONES_THOUSANDS_LIST = listOf<String>(
+    ERROR_STRING,
+    "одна",
+    "две",
+    "три",
+    "четыре",
+    "пять",
+    "шесть",
+    "семь",
+    "восемь",
+    "девять",
+)
+val TENS_LIST = listOf<String>(
+    ERROR_STRING,
+    ERROR_STRING,
+    "двадцать",
+    "тридцать",
+    "сорок",
+    "пятьдесят",
+    "шестьдесят",
+    "семьдесят",
+    "восемьдесят",
+    "девяносто"
+)
+val IRREGULAR_TENS_LIST = listOf<String>(
+    "десять",
+    "одиннадцать",
+    "двенадцать",
+    "тринадцать",
+    "четырнадцать",
+    "пятнадцать",
+    "шестнадцать",
+    "семнадцать",
+    "восемнадцать",
+    "девятнадцать"
+)
+val HUNDREDS_LIST = listOf<String>(
+    ERROR_STRING,
+    "сто",
+    "двести",
+    "триста",
+    "четыреста",
+    "пятьсот",
+    "шестьсот",
+    "семьсот",
+    "восемьсот",
+    "девятьсот",
+)
+
 /**
  * Очень сложная (7 баллов)
  *
@@ -298,68 +361,6 @@ const val ERROR_STRING = "Err"
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
 fun russian(n: Int): String {
-
-    val ones = listOf<String>(
-        ERROR_STRING,
-        "один",
-        "два",
-        "три",
-        "четыре",
-        "пять",
-        "шесть",
-        "семь",
-        "восемь",
-        "девять",
-    )
-    val onesThousands = listOf<String>(
-        ERROR_STRING,
-        "одна",
-        "две",
-        "три",
-        "четыре",
-        "пять",
-        "шесть",
-        "семь",
-        "восемь",
-        "девять",
-    )
-    val tens = listOf<String>(
-        ERROR_STRING,
-        ERROR_STRING,
-        "двадцать",
-        "тридцать",
-        "сорок",
-        "пятьдесят",
-        "шестьдесят",
-        "семьдесят",
-        "восемьдесят",
-        "девяносто"
-    )
-    val irregularTens = listOf<String>(
-        "десять",
-        "одиннадцать",
-        "двенадцать",
-        "тринадцать",
-        "четырнадцать",
-        "пятнадцать",
-        "шестнадцать",
-        "семнадцать",
-        "восемнадцать",
-        "девятнадцать"
-    )
-    val hundreds = listOf<String>(
-        ERROR_STRING,
-        "сто",
-        "двести",
-        "триста",
-        "четыреста",
-        "пятьсот",
-        "шестьсот",
-        "семьсот",
-        "восемьсот",
-        "девятьсот",
-    )
-
     if (n == 0)
         return "ноль"
 
@@ -369,15 +370,15 @@ fun russian(n: Int): String {
 
     if (firstHalf != 0) {
         if (firstHalf / 100 != 0)
-            res += hundreds[firstHalf / 100]
+            res += HUNDREDS_LIST[firstHalf / 100]
 
         if (firstHalf % 100 in 10..19)
-            res += irregularTens[firstHalf % 10]
+            res += IRREGULAR_TENS_LIST[firstHalf % 10]
         else {
             if ((firstHalf % 100) / 10 != 0)
-                res += tens[(firstHalf % 100) / 10]
+                res += TENS_LIST[(firstHalf % 100) / 10]
             if (firstHalf % 10 != 0)
-                res += onesThousands[firstHalf % 10]
+                res += ONES_THOUSANDS_LIST[firstHalf % 10]
         }
         res += when {
             firstHalf % 100 in 11..19 -> "тысяч"
@@ -389,15 +390,15 @@ fun russian(n: Int): String {
 
     if (secondHalf != 0) {
         if (secondHalf / 100 != 0)
-            res += hundreds[secondHalf / 100]
+            res += HUNDREDS_LIST[secondHalf / 100]
 
         if (secondHalf % 100 in 10..19)
-            res += irregularTens[secondHalf % 10]
+            res += IRREGULAR_TENS_LIST[secondHalf % 10]
         else {
             if ((secondHalf % 100) / 10 != 0)
-                res += tens[(secondHalf % 100) / 10]
+                res += TENS_LIST[(secondHalf % 100) / 10]
             if (secondHalf % 10 != 0)
-                res += ones[secondHalf % 10]
+                res += ONES_LIST[secondHalf % 10]
         }
     }
 

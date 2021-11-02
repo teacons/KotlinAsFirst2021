@@ -176,14 +176,14 @@ class Tests {
         assertEquals("7*7*31*31*151*151", factorizeToString(1073676289))
         assertEquals("1073676287", factorizeToString(1073676287))
         assertEquals(Int.MAX_VALUE.toString(), factorizeToString(Int.MAX_VALUE))
-    }
+        }
 
-    @Test
-    @Tag("3")
-    fun convert() {
-        assertEquals(listOf(1), convert(1, 2))
-        assertEquals(listOf(1, 2, 1, 0), convert(100, 4))
-        assertEquals(listOf(1, 3, 12), convert(250, 14))
+        @Test
+        @Tag("3")
+        fun convert() {
+            assertEquals(listOf(1), convert(1, 2))
+            assertEquals(listOf(1, 2, 1, 0), convert(100, 4))
+            assertEquals(listOf(1, 3, 12), convert(250, 14))
         assertEquals(listOf(2, 14, 12), convert(1000, 19))
     }
 

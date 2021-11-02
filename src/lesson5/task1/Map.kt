@@ -2,6 +2,9 @@
 
 package lesson5.task1
 
+import java.lang.NullPointerException
+import java.util.Collections.max
+
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
 // Рекомендуемое количество баллов = 9
@@ -96,7 +99,13 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  *   buildGrades(mapOf("Марат" to 3, "Семён" to 5, "Михаил" to 5))
  *     -> mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат"))
  */
-fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> = TODO()
+fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
+    val res = mutableMapOf<Int, List<String>>()
+    for ((name, score) in grades) {
+        res[score] = res[score]?.plus(name) ?: listOf(name)
+    }
+    return res
+}
 
 /**
  * Простая (2 балла)
@@ -108,7 +117,13 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> = TODO()
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")) -> true
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
-fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = TODO()
+fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
+    for ((key, value) in a)
+        if (b[key] == null || b[key] != value) {
+            return false
+        }
+    return true
+}
 
 /**
  * Простая (2 балла)
@@ -125,7 +140,10 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = TODO()
  *     -> a changes to mutableMapOf() aka becomes empty
  */
 fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
-    TODO()
+    for ((key, value) in b)
+        if (a[key] != null && a[key] == value) {
+            a.remove(key)
+        }
 }
 
 /**
@@ -135,7 +153,10 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  * В выходном списке не должно быть повторяющихся элементов,
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = TODO()
+fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = a.intersect(b).toList()
+// !!!
+// Скажите пожалуйста. быстрее ли это, по Вышему мнению, будет, чем:
+// a.toSet().intersect(b.toSet()).toList()
 
 /**
  * Средняя (3 балла)
@@ -154,7 +175,14 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = TODO()
  *     mapOf("Emergency" to "911", "Police" to "02")
  *   ) -> mapOf("Emergency" to "112, 911", "Police" to "02")
  */
-fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> = TODO()
+fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
+    val res = mapA.toMutableMap()
+    for ((key, value) in mapB) {
+        res[key] = res[key]?.plus(if (res[key] == value) "" else ", $value") ?: value
+    }
+
+    return res
+}
 
 /**
  * Средняя (4 балла)
@@ -166,7 +194,13 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  *   averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0))
  *     -> mapOf("MSFT" to 150.0, "NFLX" to 40.0)
  */
-fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> = TODO()
+fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
+    val costs = mutableMapOf<String, List<Double>>()
+    for ((first, second) in stockPrices) {
+        costs[first] = costs[first]?.plus(second) ?: listOf(second)
+    }
+    return costs.mapValues { it.value.average() }
+}
 
 /**
  * Средняя (4 балла)
@@ -194,7 +228,8 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
+fun canBuildFrom(chars: List<Char>, word: String): Boolean =
+    chars.toSet() == word.toSet()
 
 /**
  * Средняя (4 балла)
@@ -208,7 +243,10 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
  * Например:
  *   extractRepeats(listOf("a", "b", "a")) -> mapOf("a" to 2)
  */
-fun extractRepeats(list: List<String>): Map<String, Int> = TODO()
+fun extractRepeats(list: List<String>): Map<String, Int> =
+    list.associateWith {
+        list.count { el -> el == it }
+    }.filter { it.value > 1 }
 
 /**
  * Средняя (3 балла)
@@ -222,7 +260,24 @@ fun extractRepeats(list: List<String>): Map<String, Int> = TODO()
  * Например:
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
-fun hasAnagrams(words: List<String>): Boolean = TODO()
+fun hasAnagrams(words: List<String>): Boolean {
+    val wordHashes = mutableListOf<Int>() // hashes based on chars and their counts in a word
+    for (word in words) {
+        val mapWithCounts = word.toSet().associateWith {
+            word.count { char -> char == it }
+        }
+        wordHashes.add(mapWithCounts.hashCode())
+    }
+    // !!!
+    // Скажите, пожалуйста, решение через отдельное высчитывание хешей быстрее будет, чем при простом переборе на равенство?
+
+    for (i in 0..wordHashes.size - 2)
+        for (j in (i + 1) until wordHashes.size)
+            if (wordHashes[i] == wordHashes[j])
+                return true
+
+    return false
+}
 
 /**
  * Сложная (5 баллов)
@@ -258,6 +313,29 @@ fun hasAnagrams(words: List<String>): Boolean = TODO()
  *          "GoodGnome" to setOf()
  *        )
  */
+/*fun genHandshakesSet(friend: String, friends: Map<String, Set<String>>): Set<String> {
+    val res = friends[friend] ?: setOf()
+    var checkedCount = 0
+    while (checkedCount < res.size) {
+
+
+        checkedCount++
+    }
+
+
+    return res
+}
+
+fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
+    val res = mutableMapOf<String, Set<String>>()
+
+    for ((key, value) in friends)
+        res[key] = genHandshakesSet(key, friends)
+
+    return res
+}
+*/
+
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> = TODO()
 
 /**
@@ -277,7 +355,17 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
-fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
+fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    val set = list.map { kotlin.math.abs(number - it) }.intersect(list)
+    if (set.isEmpty() ||
+        set.size == 1 && list.count { it == set.first() } == 1
+    ) {
+        return -1 to -1
+    }
+
+    return list.indexOf(set.last()) to list.indexOfLast { it == set.first() }
+
+}
 
 /**
  * Очень сложная (8 баллов)
@@ -300,4 +388,42 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+
+    // Здравствуйте!
+    // Да, я понимаю, что моя реализация занимает очень много памяти, однако пока могу Вам предложить к расмотрению
+    // только такую версию. Может, Вы могли бы подсказать, как снизить затраты на память?
+    // Заранее спасибо!
+
+    val count = treasures.size
+    val adds = MutableList(count + 1) { MutableList(capacity + 1) { setOf<Int>() } }
+
+    val associatedTreasures = treasures.keys.toList()
+
+    val costs = MutableList(count + 1) { IntArray(capacity + 1) { 0 } }
+
+    for (i in 1..count) {
+        for (j in 0..capacity) {
+            if (treasures[associatedTreasures[i - 1]] == null)
+                throw NullPointerException("[ERROR] No treasure found")
+
+            val weight = treasures[associatedTreasures[i - 1]]!!.first
+            adds[i][j] = adds[i - 1][j] // is meant to be in both branches, but overwritten in sum cases
+            if (j < weight) {
+                costs[i][j] = costs[i - 1][j]
+                //adds[i][j] = adds[i - 1][j]
+            } else {
+                val cost = treasures[associatedTreasures[i - 1]]!!.second
+                val maxCost = kotlin.math.max(costs[i - 1][j], costs[i - 1][j - weight] + cost)
+                costs[i][j] = maxCost
+
+                if (maxCost == costs[i - 1][j - weight] + cost) {
+                    adds[i][j] = adds[i - 1][j - weight] + i
+                } /*else {
+                    adds[i][j] = adds[i - 1][j]
+                }*/
+            }
+        }
+    }
+    return adds[count][capacity].map { associatedTreasures[it - 1] }.toSet()
+}
