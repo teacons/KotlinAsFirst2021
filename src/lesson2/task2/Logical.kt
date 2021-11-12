@@ -4,6 +4,7 @@ package lesson2.task2
 
 import lesson1.task1.sqr
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -82,8 +83,9 @@ fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
         b -> min(a, c)
         else -> min(a, b)
     }
+    val minHoleSize = min(r, s)
+    val maxHoleSize = max(r, s)
 
-    return minSizeFirst <= r && minSizeSecond <= s ||
-            minSizeFirst <= s && minSizeSecond <= r
+    return minSizeFirst <= minHoleSize && minSizeSecond <= maxHoleSize
 
 }

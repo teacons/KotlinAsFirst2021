@@ -2,7 +2,10 @@
 
 package lesson5.task1
 
-import java.lang.NullPointerException
+import ru.spbstu.wheels.defaultCopy
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.collections.sortedByDescending as sortedByDescending1
 
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
@@ -153,9 +156,6 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = a.intersect(b).toList()
-// !!!
-// Скажите пожалуйста. быстрее ли это, по Вышему мнению, будет, чем:
-// a.toSet().intersect(b.toSet()).toList()
 
 /**
  * Средняя (3 балла)
@@ -260,22 +260,9 @@ fun extractRepeats(list: List<String>): Map<String, Int> =
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    val wordHashes = mutableListOf<Int>() // hashes based on chars and their counts in a word
-    for (word in words) {
-        val mapWithCounts = word.toSet().associateWith {
-            word.count { char -> char == it }
-        }
-        wordHashes.add(mapWithCounts.hashCode())
-    }
-    // !!!
-    // Скажите, пожалуйста, решение через отдельное высчитывание хешей быстрее будет, чем при простом переборе на равенство?
+    val sortedWords = words.map { it.toCharArray().sorted().joinToString(separator = "") }.toSet()
 
-    for (i in 0..wordHashes.size - 2)
-        for (j in (i + 1) until wordHashes.size)
-            if (wordHashes[i] == wordHashes[j])
-                return true
-
-    return false
+    return sortedWords.size != words.size
 }
 
 /**
@@ -355,24 +342,21 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    if (number % 2 == 0 && list.contains(number / 2)) {
-        if (list.count { it == number / 2 } >= 2) {
-            val first = list.indexOf(number / 2)
-            val second = list.subList(first + 1, list.size).indexOf(number / 2) + first + 1
-            return first to second
+    val map = mutableMapOf<Int, Int>()
+    for (i in list.indices) {
+        if (list[i] > number) {
+            continue
+        }
+        val second = map[number - list[i]]
+        if (second != null)
+            return min(second, i) to max(second, i)
+        else {
+            map[list[i]] = i
+            map[number - list[i]] = i
         }
     }
-    var checking = list.map { kotlin.math.abs(number - it) }.intersect(list).sorted()
-    if (checking.size <= 1) {
-        return -1 to -1
-    }
 
-    checking = listOf(checking.first(), checking.last())
-
-    val first = list.indexOfFirst { checking.contains(it) }
-    val second = list.subList(first + 1, list.size).indexOf((checking - list[first]).first()) + first + 1
-    return first to second
-
+    return -1 to -1
 }
 
 /**
@@ -398,40 +382,26 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
 
-    // Здравствуйте!
-    // Да, я понимаю, что моя реализация занимает очень много памяти, однако пока могу Вам предложить к расмотрению
-    // только такую версию. Может, Вы могли бы подсказать, как снизить затраты на память?
-    // Заранее спасибо!
-
     val count = treasures.size
-    val adds = MutableList(count + 1) { MutableList(capacity + 1) { setOf<Int>() } }
 
     val associatedTreasures = treasures.keys.toList()
-
-    val costs = MutableList(count + 1) { IntArray(capacity + 1) { 0 } }
+    val costs = MutableList(count + 1) { MutableList(capacity + 1) { 0 to setOf<String>() } }
 
     for (i in 1..count) {
-        for (j in 0..capacity) {
-            if (treasures[associatedTreasures[i - 1]] == null)
-                throw NullPointerException("[ERROR] No treasure found")
+        val treasure =
+            treasures[associatedTreasures[i - 1]] ?: throw NullPointerException("[ERROR] No treasure found")
+        val weight = treasure.first
+        costs[i] = costs[i - 1].toMutableList()
 
-            val weight = treasures[associatedTreasures[i - 1]]!!.first
-            adds[i][j] = adds[i - 1][j] // is meant to be in both branches, but overwritten in sum cases
-            if (j < weight) {
-                costs[i][j] = costs[i - 1][j]
-                //adds[i][j] = adds[i - 1][j]
-            } else {
-                val cost = treasures[associatedTreasures[i - 1]]!!.second
-                val maxCost = kotlin.math.max(costs[i - 1][j], costs[i - 1][j - weight] + cost)
-                costs[i][j] = maxCost
+        for (j in weight..capacity) {
+            val newCost = costs[i - 1][j - weight].first + treasure.second
+            val maxCost = kotlin.math.max(costs[i - 1][j].first, newCost)
+            costs[i][j] = maxCost to costs[i][j].second
 
-                if (maxCost == costs[i - 1][j - weight] + cost) {
-                    adds[i][j] = adds[i - 1][j - weight] + i
-                } /*else {
-                    adds[i][j] = adds[i - 1][j]
-                }*/
+            if (maxCost == newCost) {
+                costs[i][j] = maxCost to (costs[i - 1][j - weight].second + associatedTreasures[i - 1])
             }
         }
     }
-    return adds[count][capacity].map { associatedTreasures[it - 1] }.toSet()
+    return costs[count][capacity].second
 }
