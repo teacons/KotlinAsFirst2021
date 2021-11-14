@@ -130,7 +130,7 @@ fun dateDigitToStr(digital: String): String {
     val day = time[0].toIntOrNull()
     val month = time[1].toIntOrNull()
     val year = time[2].toIntOrNull()
-    if (month == null || month < 1 || day == null || year == null) {
+    if (month == null || month !in 1..12 || day == null || year == null) {
         return ""
     }
 
@@ -292,6 +292,8 @@ fun isValidCommands(commands: String): Boolean {
 
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     val values = MutableList(cells) { 0 }
+    if (commands == "") return values
+
     val clearCommands = commands.filter { it != ' ' }
     var valuesPointer = cells / 2
     var commandsPointer = 0
