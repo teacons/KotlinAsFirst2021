@@ -328,7 +328,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
                 if (values[valuesPointer] == 0) {
                     var jump = 0
                     var innerLoopCount = 1
-                    while (clearCommands[commandsPointer + jump] != ']' && innerLoopCount != 0) {
+                    while (!(clearCommands[commandsPointer + jump] == ']' && innerLoopCount == 0)) {
                         jump++
                         if (clearCommands[commandsPointer + jump] == '[') {
                             innerLoopCount++
