@@ -340,9 +340,8 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
                     commandsPointer += jump
                 } else {
                     loopPointers.push(commandsPointer)
-                    i++
+                    i += 2
                 }
-                i++
             }
             ']' -> {
                 if (values[valuesPointer] != 0) {
