@@ -2,6 +2,11 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
+import java.util.*
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -62,6 +67,20 @@ fun main() {
     }
 }
 
+val MONTHS = listOf(
+    "января",
+    "февраля",
+    "марта",
+    "апреля",
+    "мая",
+    "июня",
+    "июля",
+    "августа",
+    "сентября",
+    "октября",
+    "ноября",
+    "декабря"
+)
 
 /**
  * Средняя (4 балла)
@@ -74,7 +93,24 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+
+fun dateStrToDigit(str: String): String {
+    val time = str.split(" ")
+    if (time.size != 3)
+        return ""
+
+    val day = time[0].toIntOrNull()
+    val month = MONTHS.indexOf(time[1]) + 1
+    val year = time[2].toIntOrNull()
+    if (month < 1 || day == null || year == null) {
+        return ""
+    }
+
+    return when {
+        day > daysInMonth(month, year) -> ""
+        else -> String.format("%02d.%02d.%d", day, month, year)
+    }
+}
 
 /**
  * Средняя (4 балла)
@@ -86,7 +122,24 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val time = digital.split(".")
+    if (time.size != 3)
+        return ""
+
+    val day = time[0].toIntOrNull()
+    val month = time[1].toIntOrNull()
+    val year = time[2].toIntOrNull()
+    if (month == null || month < 1 || day == null || year == null) {
+        return ""
+    }
+
+    return when {
+        day > daysInMonth(month, year) -> ""
+        else -> String.format("""%d %s %d""", day, MONTHS[month - 1], year)
+    }
+
+}
 
 /**
  * Средняя (4 балла)
@@ -213,4 +266,96 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+
+fun isValidCommands(commands: String): Boolean {
+    val chars = "+-><[]"
+    var loopRate = 0
+    for (char in commands) {
+        if (char !in chars) {
+            return false
+        }
+        if (char == '[') {
+            loopRate++
+        }
+        if (char == ']') {
+            loopRate--
+            if (loopRate < 0)
+                return false
+        }
+
+    }
+    if (loopRate != 0) {
+        return false
+    }
+    return true
+}
+
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    val values = MutableList(cells) { 0 }
+    val clearCommands = commands.filter { it != ' ' }
+    var valuesPointer = cells / 2
+    var commandsPointer = 0
+    if (!isValidCommands(clearCommands)) {
+        throw IllegalArgumentException()
+    }
+    val loopPointers = Stack<Int>()
+
+    var i = 0
+    while (i < limit) {
+        when (clearCommands[commandsPointer]) {
+            '>' -> {
+                valuesPointer++
+                if (valuesPointer !in 0 until cells) {
+                    throw IllegalStateException()
+                }
+            }
+            '<' -> {
+                valuesPointer--
+                if (valuesPointer !in 0 until cells) {
+                    throw IllegalStateException()
+                }
+            }
+            '+' -> {
+                values[valuesPointer]++
+            }
+            '-' -> {
+                values[valuesPointer]--
+            }
+
+            '[' -> {
+                if (values[valuesPointer] == 0) {
+                    var jump = 0
+                    var innerLoopCount = 1
+                    while (clearCommands[commandsPointer + jump] != ']' && innerLoopCount != 0) {
+                        jump++
+                        if (clearCommands[commandsPointer + jump] == '[') {
+                            innerLoopCount++
+                        }
+                        if (clearCommands[commandsPointer + jump] == ']') {
+                            innerLoopCount--
+                        }
+                    }
+                    commandsPointer += jump
+                } else {
+                    loopPointers.push(commandsPointer)
+                    i++
+                }
+                i++
+            }
+            ']' -> {
+                if (values[valuesPointer] != 0) {
+                    commandsPointer = loopPointers.peek()
+                } else {
+                    loopPointers.pop()
+                    i++
+                }
+            }
+        }
+
+        if (commandsPointer == clearCommands.length - 1) break
+        commandsPointer++
+        i++
+    }
+
+    return values
+}
