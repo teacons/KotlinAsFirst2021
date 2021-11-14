@@ -346,9 +346,11 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             }
             ']' -> {
                 if (values[valuesPointer] != 0) {
-                    commandsPointer = loopPointers.peek()
+                    if (!loopPointers.isEmpty())
+                        commandsPointer = loopPointers.peek()
                 } else {
-                    loopPointers.pop()
+                    if (!loopPointers.isEmpty())
+                        loopPointers.pop()
                     i++
                 }
             }
