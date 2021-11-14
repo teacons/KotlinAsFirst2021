@@ -292,9 +292,9 @@ fun isValidCommands(commands: String): Boolean {
 
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     val values = MutableList(cells) { 0 }
-    if (commands == "") return values
-
     val clearCommands = commands.filter { it != ' ' }
+    if (clearCommands == "") return values
+
     var valuesPointer = cells / 2
     var commandsPointer = 0
     if (!isValidCommands(clearCommands)) {
