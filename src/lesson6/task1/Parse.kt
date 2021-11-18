@@ -136,7 +136,7 @@ fun dateDigitToStr(digital: String): String {
 
     return when {
         day > daysInMonth(month, year) -> ""
-        else -> String.format("""%d %s %d""", day, MONTHS[month - 1], year)
+        else -> String.format("%d %s %d", day, MONTHS[month - 1], year)
     }
 
 }
@@ -268,7 +268,7 @@ fun fromRoman(roman: String): Int = TODO()
  */
 
 fun isValidCommands(commands: String): Boolean {
-    val chars = "+-><[]"
+    val chars = "+-><[ ]"
     var loopRate = 0
     for (char in commands) {
         if (char !in chars) {
@@ -289,22 +289,32 @@ fun isValidCommands(commands: String): Boolean {
     }
     return true
 }
+fun findNextHop(commands: String, from: Int): Int {
+    var jump = 0
+    var loopNesting = 1
+    while (commands[from + jump] != ']' || loopNesting != 0) {
+        jump++
+        when (commands[from + jump]) {
+            ']' -> loopNesting--
+            '[' -> loopNesting++
+        }
+    }
+    return from + jump
+}
 
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     val values = MutableList(cells) { 0 }
-    val clearCommands = commands.filter { it != ' ' }
-    if (clearCommands == "") return values
 
     var valuesPointer = cells / 2
     var commandsPointer = 0
-    if (!isValidCommands(clearCommands)) {
+    if (!isValidCommands(commands)) {
         throw IllegalArgumentException()
     }
-    val loopPointers = Stack<Int>()
+    val loopStartPointers = Stack<Int>()
 
     var i = 0
     while (i < limit) {
-        when (clearCommands[commandsPointer]) {
+        when (commands[commandsPointer]) {
             '>' -> {
                 valuesPointer++
                 if (valuesPointer !in 0 until cells) {
@@ -323,39 +333,23 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             '-' -> {
                 values[valuesPointer]--
             }
-
             '[' -> {
                 if (values[valuesPointer] == 0) {
-                    var jump = 0
-                    var innerLoopCount = 1
-                    while (!(clearCommands[commandsPointer + jump] == ']' && innerLoopCount == 0)) {
-                        jump++
-                        if (clearCommands[commandsPointer + jump] == '[') {
-                            innerLoopCount++
-                        }
-                        if (clearCommands[commandsPointer + jump] == ']') {
-                            innerLoopCount--
-                        }
-                    }
-                    commandsPointer += jump
+                    commandsPointer = findNextHop(commands, commandsPointer)
                 } else {
-                    loopPointers.push(commandsPointer)
-                    i += 2
+                    loopStartPointers.push(commandsPointer)
                 }
             }
             ']' -> {
                 if (values[valuesPointer] != 0) {
-                    if (!loopPointers.isEmpty())
-                        commandsPointer = loopPointers.peek()
+                    commandsPointer = loopStartPointers.peek()
                 } else {
-                    if (!loopPointers.isEmpty())
-                        loopPointers.pop()
-                    i++
+                    loopStartPointers.pop()
                 }
             }
         }
 
-        if (commandsPointer == clearCommands.length - 1) break
+        if (commandsPointer == commands.length - 1) break
         commandsPointer++
         i++
     }

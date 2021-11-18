@@ -136,7 +136,7 @@ class Tests {
         assertThrows(IllegalStateException::class.java) { computeDeviceCells(20, ">>>>>>>>>>>>>", 12) }
 
         assertEquals(listOf(0), computeDeviceCells(1, "[[]++]", 500))
-        assertEquals(listOf(-250), computeDeviceCells(1, "-[-]", 500))
+        assertEquals(listOf(0), computeDeviceCells(1, "-[-[++]]", 10))
         assertEquals(listOf(0, 0, 0, 0, 0, 1, 1, 1, 1, 1), computeDeviceCells(10, "+>+>+>+>+", 10000))
         assertEquals(listOf(-1, -1, -1, -1, -1, 0, 0, 0, 0, 0), computeDeviceCells(10, "<-<-<-<-<-", 10000))
         assertEquals(listOf(1, 1, 1, 1, 1, 0, 0, 0, 0, 0), computeDeviceCells(10, "- <<<<< +[>+]", 10000))
