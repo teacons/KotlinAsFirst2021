@@ -136,7 +136,7 @@ fun dateDigitToStr(digital: String): String {
 
     return when {
         day > daysInMonth(month, year) -> ""
-        else -> String.format("%d %s %d", day, MONTHS[month - 1], year)
+        else -> "$day ${MONTHS[month - 1]} $year"
     }
 
 }

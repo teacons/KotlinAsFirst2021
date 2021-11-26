@@ -2,7 +2,9 @@
 
 package lesson7.task1
 
+import java.io.BufferedWriter
 import java.io.File
+import java.util.*
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -62,15 +64,13 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Все остальные строки должны быть перенесены без изменений, включая пустые строки.
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
-fun deleteMarked(inputName: String, outputName: String) {
-    with(File(outputName).bufferedWriter()) {
-        File(inputName).readLines().filter { it.isEmpty() || it[0] != '_' }.map {
-            write(it)
-            newLine()
+fun deleteMarked(inputName: String, outputName: String) =
+    File(outputName).bufferedWriter().use { output ->
+        File(inputName).readLines().filter { it.isEmpty() || it[0] != '_' }.forEach {
+            output.write(it)
+            output.newLine()
         }
-        close()
     }
-}
 
 /**
  * Средняя (14 баллов)
@@ -274,21 +274,132 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  *
  * Соответствующий выходной файл:
 <html>
-    <body>
-        <p>
-            Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
-            Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
-        </p>
-        <p>
-            Suspendisse <s>et elit in enim tempus iaculis</s>.
-        </p>
-    </body>
+<body>
+<p>
+Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
+Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
+</p>
+<p>
+Suspendisse <s>et elit in enim tempus iaculis</s>.
+</p>
+</body>
 </html>
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+
+fun String.count(offset: Int, str: String): Int {
+    var count = 0
+    for (i in 0 until (this.length) - str.length) {
+        if (this.substring(i, i + str.length) == str) count++
+    }
+    return count
+}
+
+private abstract class HtmlParser(var inputName: String, outputName: String) {
+
+    var isParagraph = false
+    var output: BufferedWriter
+
+    init {
+        output = File(outputName).bufferedWriter()
+    }
+
+    fun parseToOutput() {
+        File(inputName).bufferedReader().forEachLine { line ->
+            if (line.isEmpty()) {
+                write("</p>")
+                write("<p>")
+            } else parseLine(line)
+            write('\n')
+        }
+        close()
+    }
+
+    protected abstract fun parseLine(line: String)
+
+    open fun write(text: String) {
+        output.write(text)
+        when (text) {
+            "<p>" -> isParagraph = true
+            "</p>" -> isParagraph = false
+        }
+
+    }
+
+    fun write(char: Char) {
+        output.write(char.toString())
+    }
+
+    fun start() {
+        write("<html>")
+        write("<body>")
+        write("<p>")
+    }
+
+    private fun close() {
+        write("</p></body></html>")
+        output.close()
+    }
+
+}
+
+private class HtmlParserSimple(inputName: String, outputName: String) : HtmlParser(inputName, outputName) {
+    private var isItalicizing = false
+    private var isBolding = false
+    private var isCrossing = false
+
+    override fun write(text: String) {
+        super.write(text)
+        when (text) {
+            "<s>" -> isCrossing = true
+            "</s>" -> isCrossing = false
+            "<i>" -> isItalicizing = true
+            "</i>" -> isItalicizing = false
+            "<b>" -> isBolding = true
+            "</b>" -> isBolding = false
+        }
+    }
+
+    override fun parseLine(line: String) {
+        var i = 0
+        while (i < line.length) {
+            when (line[i]) {
+                '~' -> {
+                    if (isCrossing) write("</s>")
+                    else write("<s>")
+                    i++
+                }
+                '*' -> {
+                    if (i == line.length - 1) write("</i>")
+                    else if (line[i + 1] == '*') {
+                        if (isBolding) write("</b>") else write("<b>")
+                        i++
+                    } else if (isItalicizing) write("</i>")
+                    else write("<i>")
+                }
+                else -> write(line[i])
+            }
+            i++
+        }
+    }
+}
+
+private class HtmlParserLists(inputName: String, outputName: String) : HtmlParser(inputName, outputName) {
+
+    override fun parseLine(line: String) {
+        if ((line.count { it == '*' } - line.count(0, "**") * 2) % 2 == 1) {
+            write("<ul>")
+            write("<li>")
+        }
+        TODO()
+    }
+}
+
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    val htmlParser = HtmlParserSimple(inputName, outputName)
+    htmlParser.start()
+    htmlParser.parseToOutput()
 }
 
 /**
@@ -325,17 +436,17 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  *
  * Пример входного файла:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
-* Утка по-пекински
-    * Утка
-    * Соус
-* Салат Оливье
+ * Утка по-пекински
+     * Утка
+     * Соус
+ * Салат Оливье
     1. Мясо
-        * Или колбаса
+         * Или колбаса
     2. Майонез
     3. Картофель
     4. Что-то там ещё
-* Помидоры
-* Фрукты
+ * Помидоры
+ * Фрукты
     1. Бананы
     23. Яблоки
         1. Красные
@@ -346,50 +457,53 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  * Соответствующий выходной файл:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
 <html>
-  <body>
-    <p>
-      <ul>
-        <li>
-          Утка по-пекински
-          <ul>
-            <li>Утка</li>
-            <li>Соус</li>
-          </ul>
-        </li>
-        <li>
-          Салат Оливье
-          <ol>
-            <li>Мясо
-              <ul>
-                <li>Или колбаса</li>
-              </ul>
-            </li>
-            <li>Майонез</li>
-            <li>Картофель</li>
-            <li>Что-то там ещё</li>
-          </ol>
-        </li>
-        <li>Помидоры</li>
-        <li>Фрукты
-          <ol>
-            <li>Бананы</li>
-            <li>Яблоки
-              <ol>
-                <li>Красные</li>
-                <li>Зелёные</li>
-              </ol>
-            </li>
-          </ol>
-        </li>
-      </ul>
-    </p>
-  </body>
+    <body>
+        <p>
+            <ul>
+                <li>
+                Утка по-пекински
+                    <ul>
+                        <li>Утка</li>
+                        <li>Соус</li>
+                    </ul>
+                </li>
+                <li>
+                Салат Оливье
+                    <ol>
+                        <li>Мясо
+                            <ul>
+                                <li>Или колбаса</li>
+                            </ul>
+                        </li>
+                        <li>Майонез</li>
+                        <li>Картофель</li>
+                        <li>Что-то там ещё</li>
+                    </ol>
+                </li>
+                <li>Помидоры</li>
+                <li>Фрукты
+                    <ol>
+                        <li>Бананы</li>
+                        <li>Яблоки
+                            <ol>
+                                <li>Красные</li>
+                                <li>Зелёные</li>
+                            </ol>
+                        </li>
+                    </ol>
+                </li>
+            </ul>
+        </p>
+    </body>
 </html>
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
- */
+ * */
+
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    TODO()
+    val htmlParser = HtmlParserLists(inputName, outputName)
+    htmlParser.start()
+    htmlParser.parseToOutput()
 }
 
 /**
@@ -400,8 +514,14 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
  * - Списки, отделённые друг от друга пустой строкой, являются разными и должны оказаться в разных параграфах выходного файла.
  *
  */
+
 fun markdownToHtml(inputName: String, outputName: String) {
-    TODO()
+    var htmlParser: HtmlParser = HtmlParserLists(inputName, "myOutputFile.txt")
+    htmlParser.start()
+    htmlParser.parseToOutput()
+
+    htmlParser = HtmlParserSimple("myOutputFile.txt", outputName)
+    htmlParser.parseToOutput()
 }
 
 /**
@@ -410,23 +530,23 @@ fun markdownToHtml(inputName: String, outputName: String) {
  * Вывести в выходной файл процесс умножения столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 111):
-   19935
-*    111
+19935
+ *    111
 --------
-   19935
+19935
 + 19935
 +19935
 --------
- 2212785
+2212785
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  * Нули в множителе обрабатывать так же, как и остальные цифры:
-  235
-*  10
+235
+ *  10
 -----
-    0
+0
 +235
 -----
- 2350
+2350
  *
  */
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
@@ -440,20 +560,21 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Вывести в выходной файл процесс деления столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 22):
-  19935 | 22
- -198     906
- ----
-    13
-    -0
-    --
-    135
-   -132
-   ----
-      3
+19935 | 22
+-198     906
+----
+13
+-0
+--
+135
+-132
+----
+3
 
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
+
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     TODO()
 }
