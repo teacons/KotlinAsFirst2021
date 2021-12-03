@@ -283,10 +283,8 @@ Basic, Ruby, Swift.
 //
 //            }
 //        }
+//        markdownToHtmlSimple("test/lesson7/task1/input_2.txt", "test/lesson7/task1/output_2.txt")
 
-
-
-        markdownToHtmlSimple("test/lesson7/task1/input_2.txt", "test/lesson7/task1/output_2.txt")
         markdownToHtmlSimple("input/markdown_simple.md", "temp.html")
         checkHtmlSimpleExample()
     }
