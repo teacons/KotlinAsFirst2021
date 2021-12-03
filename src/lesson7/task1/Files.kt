@@ -300,6 +300,7 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
 
     var isParagraph = false
     var output: BufferedWriter
+    private var outputIndex = 0
 
     init {
         output = File(outputName).bufferedWriter()
@@ -325,6 +326,9 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
     protected abstract fun parseLine(line: String)
 
     open fun write(text: String) {
+        outputIndex += text.length
+//        if (outputIndex > 2260)
+//            println("pup")
         output.write(text)
         when (text) {
             "<p>" -> isParagraph = true
@@ -335,6 +339,7 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
 
     fun write(char: Char) {
         output.write(char.toString())
+        outputIndex++
     }
 
     fun start() {
@@ -377,8 +382,7 @@ private class HtmlParserSimple(inputName: String, outputName: String) : HtmlPars
                     i++
                 }
                 '*' -> {
-                    if (i == line.length - 1) write("</i>")
-                    else if (line[i + 1] == '*') {
+                    if (i != line.length - 1 && line[i + 1] == '*') {
                         if (isBolding) write("</b>") else write("<b>")
                         i++
                     } else if (isItalicizing) write("</i>")

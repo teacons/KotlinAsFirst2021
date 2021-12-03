@@ -256,6 +256,37 @@ Basic, Ruby, Swift.
     @Test
     @Tag("22")
     fun markdownToHtmlSimple() {
+//        File("test/lesson7/task1/expected_2.txt").bufferedReader().use { expected ->
+//            File("test/lesson7/task1/output_2.txt").bufferedReader().use { output ->
+//                var line = ""
+//                var pos = 0
+//                while (true) {
+//                    val expectedChar = expected.read()
+//                    val outputChar = output.read()
+//
+//                    if (pos == 2290)
+//                        println("pup")
+//
+//                    if (expectedChar != outputChar)
+//                        throw Exception("Expected: {${expectedChar.toChar()}}, got: {${outputChar.toChar()}};\nIn line {$line}; \npos {$pos}")
+//
+//                    if (expectedChar != '\n'.code) {
+//                        line += expectedChar.toChar()
+//                        pos++
+//                    }
+//                    else {
+//                        line = ""
+//                        pos = 0
+//                    }
+//
+//                }
+//
+//            }
+//        }
+
+
+
+        markdownToHtmlSimple("test/lesson7/task1/input_2.txt", "test/lesson7/task1/output_2.txt")
         markdownToHtmlSimple("input/markdown_simple.md", "temp.html")
         checkHtmlSimpleExample()
     }
