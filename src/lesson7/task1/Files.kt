@@ -306,11 +306,17 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
     }
 
     fun parseToOutput() {
+        var isFirst = true
         File(inputName).bufferedReader().forEachLine { line ->
             if (line.isEmpty()) {
-                write("</p>")
-                write("<p>")
-            } else parseLine(line)
+                if (!isFirst) {
+                    write("</p>")
+                    write("<p>")
+                }
+            } else {
+                parseLine(line)
+                isFirst = false
+            }
             write('\n')
         }
         close()
