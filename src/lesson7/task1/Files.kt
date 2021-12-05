@@ -403,7 +403,7 @@ private class HtmlParserSimple(inputName: String, outputName: String) : HtmlPars
                                 add("""\\""")
                                 i++
                             }
-                            in (setOf('t', 's')) -> i++ // -> "\t" or "\s"
+                            't' -> i++ // -> "\t" or "\s"
                             else -> add(line[i].toString())
                         }
                     } else {
