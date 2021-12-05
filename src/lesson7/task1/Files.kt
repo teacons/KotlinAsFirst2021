@@ -391,7 +391,7 @@ private class HtmlParserSimple(inputName: String, outputName: String) : HtmlPars
     override fun parseLine(line: String) {
         var i = 0
         while (i < line.length) {
-            if (i == 9191)
+            if (i > 5621)
                 println("pup")
             when (line[i]) {
                 '\\' -> {
@@ -403,6 +403,10 @@ private class HtmlParserSimple(inputName: String, outputName: String) : HtmlPars
                             }
                             '\\' -> { // -> "\\"
                                 add("\\\\")
+                                if (i + 2 < line.length && line[i + 2] == 'n') {
+                                    add("n")
+                                    i++
+                                }
                                 i++
                             }
                             't' -> i++ // -> "\t" or "\s"
