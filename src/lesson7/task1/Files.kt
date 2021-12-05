@@ -4,7 +4,6 @@ package lesson7.task1
 
 import java.io.BufferedWriter
 import java.io.File
-import java.util.*
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -297,58 +296,87 @@ fun String.count(offset: Int, str: String): Int {
 }
 
 private abstract class HtmlParser(var inputName: String, outputName: String) {
+    class Toggle(val tag: String, startState: Boolean = false) {
+        var state: Boolean
+        var on: String
+        var off: String
 
-    var isParagraph = false
-    var output: BufferedWriter
-    private var outputIndex = 0
+        init {
+            state = startState
+            on = "<${tag}>"
+            off = "</${tag}>"
+        }
+
+        fun toggle(): String {
+            if (state) {
+                state = false
+                return off
+            }
+            state = true
+            return on
+        }
+
+        override fun toString(): String = tag
+        override fun equals(other: Any?): Boolean = when (other) {
+            is Toggle -> this.tag == other.tag
+            is String -> other == this.on || other == this.off
+            else -> false
+        }
+    }
+
+    private var paragraphToggle = Toggle("p")
+    private var output: BufferedWriter
+    private val stringBuilder = StringBuilder()
+    private var newLineSeries = 0
+
 
     init {
         output = File(outputName).bufferedWriter()
     }
 
     fun parseToOutput() {
-        var isFirst = true
-        File(inputName).bufferedReader().forEachLine { line ->
-            if (line.isEmpty()) {
-                if (!isFirst) {
-                    write("</p>")
-                    write("<p>")
-                }
-            } else {
-                parseLine(line)
-                isFirst = false
-            }
-            write('\n')
+        File(inputName).bufferedReader().forEachLine { inputLine ->
+            parseLine(inputLine)
+            newLine()
         }
-        close()
     }
 
     protected abstract fun parseLine(line: String)
 
-    open fun write(text: String) {
-        outputIndex += text.length
-//        if (outputIndex > 2260)
-//            println("pup")
-        output.write(text)
-        when (text) {
-            "<p>" -> isParagraph = true
-            "</p>" -> isParagraph = false
-        }
-
+    fun endLine() {
+        write(stringBuilder.toString())
+        stringBuilder.clear()
     }
 
-    fun write(char: Char) {
-        output.write(char.toString())
-        outputIndex++
+    fun newLine() {
+        newLineSeries++
+        if (newLineSeries % 2 == 0) {
+            stringBuilder.append(paragraphToggle.toggle())
+        }
+        endLine()
+        newLineSeries %= 2
+    }
+
+    fun add(text: String) {
+        if (text.isBlank()) return
+        newLineSeries = 0
+        if (stringBuilder.isEmpty() && !paragraphToggle.state) {
+            stringBuilder.append(paragraphToggle.toggle())
+        }
+        stringBuilder.append(text)
+    }
+
+    open fun write(text: String) {
+        if (text.isBlank()) return
+        output.write(text)
     }
 
     fun start() {
         write("<html>")
         write("<body>")
-        write("<p>")
     }
 
-    private fun close() {
+    fun close() {
         write("</p></body></html>")
         output.close()
     }
@@ -356,39 +384,49 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
 }
 
 private class HtmlParserSimple(inputName: String, outputName: String) : HtmlParser(inputName, outputName) {
-    private var isItalicizing = false
-    private var isBolding = false
-    private var isCrossing = false
-
-    override fun write(text: String) {
-        super.write(text)
-        when (text) {
-            "<s>" -> isCrossing = true
-            "</s>" -> isCrossing = false
-            "<i>" -> isItalicizing = true
-            "</i>" -> isItalicizing = false
-            "<b>" -> isBolding = true
-            "</b>" -> isBolding = false
-        }
-    }
+    private val crossToggle = Toggle("s")
+    private val italicToggle = Toggle("i")
+    private val boldToggle = Toggle("b")
 
     override fun parseLine(line: String) {
         var i = 0
         while (i < line.length) {
             when (line[i]) {
+                '\\' -> {
+                    if (i + 1 < line.length) {
+                        when (line[i + 1]) {
+                            'n' -> { // -> "\n"
+                                newLine()
+                                i++
+                            }
+                            '\\' -> { // -> "\\"
+                                add("""\\""")
+                                i++
+                            }
+                            in (setOf('t', 's')) -> i++ // -> "\t" or "\s"
+                            else -> add(line[i].toString())
+                        }
+                    } else {
+                        add(line[i].toString())
+                    }
+                }
                 '~' -> {
-                    if (isCrossing) write("</s>")
-                    else write("<s>")
-                    i++
+                    if (i + 1 < line.length && line[i + 1] == '~') { // ~~
+                        add(crossToggle.toggle())
+                        i++
+                    } else {
+                        add(line[i].toString())
+                    }
                 }
                 '*' -> {
-                    if (i != line.length - 1 && line[i + 1] == '*') {
-                        if (isBolding) write("</b>") else write("<b>")
+                    if (i + 1 < line.length && line[i + 1] == '*') {// **
+                        add(boldToggle.toggle())
                         i++
-                    } else if (isItalicizing) write("</i>")
-                    else write("<i>")
+                    } else {
+                        add(italicToggle.toggle())
+                    }
                 }
-                else -> write(line[i])
+                else -> add(line[i].toString())
             }
             i++
         }
@@ -410,6 +448,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val htmlParser = HtmlParserSimple(inputName, outputName)
     htmlParser.start()
     htmlParser.parseToOutput()
+    htmlParser.close()
 }
 
 /**
@@ -447,64 +486,64 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  * Пример входного файла:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
  * Утка по-пекински
-     * Утка
-     * Соус
+ * Утка
+ * Соус
  * Салат Оливье
-    1. Мясо
-         * Или колбаса
-    2. Майонез
-    3. Картофель
-    4. Что-то там ещё
+1. Мясо
+ * Или колбаса
+2. Майонез
+3. Картофель
+4. Что-то там ещё
  * Помидоры
  * Фрукты
-    1. Бананы
-    23. Яблоки
-        1. Красные
-        2. Зелёные
+1. Бананы
+23. Яблоки
+1. Красные
+2. Зелёные
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  *
  *
  * Соответствующий выходной файл:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
 <html>
-    <body>
-        <p>
-            <ul>
-                <li>
-                Утка по-пекински
-                    <ul>
-                        <li>Утка</li>
-                        <li>Соус</li>
-                    </ul>
-                </li>
-                <li>
-                Салат Оливье
-                    <ol>
-                        <li>Мясо
-                            <ul>
-                                <li>Или колбаса</li>
-                            </ul>
-                        </li>
-                        <li>Майонез</li>
-                        <li>Картофель</li>
-                        <li>Что-то там ещё</li>
-                    </ol>
-                </li>
-                <li>Помидоры</li>
-                <li>Фрукты
-                    <ol>
-                        <li>Бананы</li>
-                        <li>Яблоки
-                            <ol>
-                                <li>Красные</li>
-                                <li>Зелёные</li>
-                            </ol>
-                        </li>
-                    </ol>
-                </li>
-            </ul>
-        </p>
-    </body>
+<body>
+<p>
+<ul>
+<li>
+Утка по-пекински
+<ul>
+<li>Утка</li>
+<li>Соус</li>
+</ul>
+</li>
+<li>
+Салат Оливье
+<ol>
+<li>Мясо
+<ul>
+<li>Или колбаса</li>
+</ul>
+</li>
+<li>Майонез</li>
+<li>Картофель</li>
+<li>Что-то там ещё</li>
+</ol>
+</li>
+<li>Помидоры</li>
+<li>Фрукты
+<ol>
+<li>Бананы</li>
+<li>Яблоки
+<ol>
+<li>Красные</li>
+<li>Зелёные</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+</p>
+</body>
 </html>
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
