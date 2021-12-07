@@ -335,17 +335,12 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
     }
 
     fun parseToOutput() {
-        val lines = File(inputName).bufferedReader().lines().toList()
-        File(inputName).bufferedReader().close()
-        var n = 1
+        val lines = File(inputName).bufferedReader().lines()
         for (line in lines) {
             parseLine(line)
-            if (n == lines.size - 5)
-                println("pup")
-            if (n != lines.size)
-                newLine()
-            n++
+            newLine()
         }
+        File(inputName).bufferedReader().close()
     }
 
     protected abstract fun parseLine(line: String)
