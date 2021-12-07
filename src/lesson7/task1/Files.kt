@@ -324,7 +324,7 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
         }
     }
 
-    private var paragraphToggle = Toggle("p")
+    private var paragraphToggle = Toggle("p", true)
     private var output: BufferedWriter
     private val stringBuilder = StringBuilder()
     private var newLineSeries = 0
@@ -375,8 +375,7 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
     }
 
     fun start() {
-        write("<html>")
-        write("<body>")
+        write("<html><body><p>")
     }
 
     fun close() {
