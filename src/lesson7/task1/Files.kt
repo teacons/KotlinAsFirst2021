@@ -391,31 +391,7 @@ private class HtmlParserSimple(inputName: String, outputName: String) : HtmlPars
     override fun parseLine(line: String) {
         var i = 0
         while (i < line.length) {
-            if (i > 5621)
-                println("pup")
             when (line[i]) {
-                '\\' -> {
-                    if (i + 1 < line.length) {
-                        when (line[i + 1]) {
-                            'n' -> { // -> "\n"
-                                newLine()
-                                i++
-                            }
-                            '\\' -> { // -> "\\"
-                                add("\\\\")
-                                if (i + 2 < line.length && line[i + 2] == 'n') {
-                                    add("n")
-                                    i++
-                                }
-                                i++
-                            }
-                            't' -> i++ // -> "\t" or "\s"
-                            else -> add(line[i].toString())
-                        }
-                    } else {
-                        add(line[i].toString())
-                    }
-                }
                 '~' -> {
                     if (i + 1 < line.length && line[i + 1] == '~') { // ~~
                         add(crossToggle.toggle())
