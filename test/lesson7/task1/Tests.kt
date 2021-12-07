@@ -256,10 +256,10 @@ Basic, Ruby, Swift.
     @Test
     @Tag("22")
     fun markdownToHtmlSimple() {
-//        if (false) {
-//            markdownToHtmlSimple("test/lesson7/task1/input_7.txt", "test/lesson7/task1/output_7.txt")
-//            File("test/lesson7/task1/expected_7.txt").bufferedReader().use { expected ->
-//                File("test/lesson7/task1/output_7.txt").bufferedReader().use { output ->
+//        if (true) {
+//            markdownToHtmlSimple("test/lesson7/task1/input_2.txt", "test/lesson7/task1/output_2.txt")
+//            File("test/lesson7/task1/expected_2.txt").bufferedReader().use { expected ->
+//                File("test/lesson7/task1/output_2.txt").bufferedReader().use { output ->
 //                    var line = ""
 //                    var pos = 0
 //                    while (true) {

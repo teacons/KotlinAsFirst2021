@@ -335,9 +335,16 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
     }
 
     fun parseToOutput() {
-        File(inputName).bufferedReader().forEachLine { inputLine ->
-            parseLine(inputLine)
-            newLine()
+        val lines = File(inputName).bufferedReader().lines().toList()
+        File(inputName).bufferedReader().close()
+        var n = 1
+        for (line in lines) {
+            parseLine(line)
+            if (n == lines.size - 5)
+                println("pup")
+            if (n != lines.size)
+                newLine()
+            n++
         }
     }
 
@@ -350,15 +357,16 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
 
     fun newLine() {
         newLineSeries++
-        if (newLineSeries % 2 == 0) {
-            stringBuilder.append(paragraphToggle.toggle())
-        }
         endLine()
-        newLineSeries %= 2
     }
 
     fun add(text: String) {
         if (text.isBlank()) return
+        while (newLineSeries / 2 > 0) {
+            stringBuilder.append(paragraphToggle.toggle())
+            endLine()
+            newLineSeries -= 2
+        }
         newLineSeries = 0
         if (stringBuilder.isEmpty() && !paragraphToggle.state) {
             stringBuilder.append(paragraphToggle.toggle())
