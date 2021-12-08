@@ -257,9 +257,9 @@ Basic, Ruby, Swift.
     @Tag("22")
     fun markdownToHtmlSimple() {
 //        if (true) {
-//            markdownToHtmlSimple("test/lesson7/task1/input_2.txt", "test/lesson7/task1/output_2.txt")
-//            File("test/lesson7/task1/expected_2.txt").bufferedReader().use { expected ->
-//                File("test/lesson7/task1/output_2.txt").bufferedReader().use { output ->
+//            markdownToHtmlSimple("test/lesson7/task1/input_8.txt", "test/lesson7/task1/output_8.txt")
+//            File("test/lesson7/task1/expected_3.txt").bufferedReader().use { expected ->
+//                File("test/lesson7/task1/output_3.txt").bufferedReader().use { output ->
 //                    var line = ""
 //                    var pos = 0
 //                    while (true) {
