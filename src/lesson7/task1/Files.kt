@@ -6,6 +6,7 @@ import java.io.BufferedWriter
 import java.io.File
 import java.lang.IllegalArgumentException
 import java.util.*
+import kotlin.math.max
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -339,12 +340,15 @@ private abstract class HtmlParser(var inputName: String, outputName: String, val
     fun parseToOutput() {
 
         val lines = File(inputName).bufferedReader().lines()
-        var count = 0
+        var maxLineLength = -1
         for (line in lines) {
             parseLine(line)
+            maxLineLength = max(line.length, maxLineLength)
             newLine()
-            count++
         }
+        if (maxLineLength < 1)
+            write("<p>")
+
         File(inputName).bufferedReader().close()
     }
 
@@ -380,7 +384,7 @@ private abstract class HtmlParser(var inputName: String, outputName: String, val
 
     fun start() {
         if (openHtmlTags)
-            write("<html><body>" + paragraphToggle.toggle())
+            write("<html><body>")
     }
 
     open fun close() {
