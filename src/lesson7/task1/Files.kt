@@ -4,6 +4,8 @@ package lesson7.task1
 
 import java.io.BufferedWriter
 import java.io.File
+import java.lang.IllegalArgumentException
+import java.util.*
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -295,11 +297,11 @@ fun String.count(offset: Int, str: String): Int {
     return count
 }
 
-private abstract class HtmlParser(var inputName: String, outputName: String) {
+private abstract class HtmlParser(var inputName: String, outputName: String, val openHtmlTags: Boolean) {
     class Toggle(val tag: String, startState: Boolean = false) {
         var state: Boolean
-        var on: String
-        var off: String
+        private var on: String
+        private var off: String
 
         init {
             state = startState
@@ -324,7 +326,7 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
         }
     }
 
-    private var paragraphToggle = Toggle("p")
+    private var paragraphToggle = Toggle("p", !openHtmlTags)
     private var output: BufferedWriter
     private val stringBuilder = StringBuilder()
     private var newLineSeries = 0
@@ -368,23 +370,26 @@ private abstract class HtmlParser(var inputName: String, outputName: String) {
         stringBuilder.append(text)
     }
 
-    open fun write(text: String) {
+    fun write(text: String) {
         if (text.isBlank()) return
         output.write(text)
     }
 
     fun start() {
-        write("<html><body>")
+        if (openHtmlTags)
+            write("<html><body>")
     }
 
-    fun close() {
-        write("</p></body></html>")
+    open fun close() {
+        if (openHtmlTags)
+            write("</p></body></html>")
         output.close()
     }
 
 }
 
-private class HtmlParserSimple(inputName: String, outputName: String) : HtmlParser(inputName, outputName) {
+private class HtmlParserSimple(inputName: String, outputName: String, openHtmlTags: Boolean = true) :
+    HtmlParser(inputName, outputName, openHtmlTags) {
     private val crossToggle = Toggle("s")
     private val italicToggle = Toggle("i")
     private val boldToggle = Toggle("b")
@@ -413,17 +418,6 @@ private class HtmlParserSimple(inputName: String, outputName: String) : HtmlPars
             }
             i++
         }
-    }
-}
-
-private class HtmlParserLists(inputName: String, outputName: String) : HtmlParser(inputName, outputName) {
-
-    override fun parseLine(line: String) {
-        if ((line.count { it == '*' } - line.count(0, "**") * 2) % 2 == 1) {
-            write("<ul>")
-            write("<li>")
-        }
-        TODO()
     }
 }
 
@@ -465,7 +459,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  * Кроме того, весь текст целиком следует обернуть в теги <html><body><p>...</p></body></html>
  *
  * Все остальные части исходного текста должны остаться неизменными с точностью до наборов пробелов и переносов строк.
- *
+ * 30 yjz,hz
  * Пример входного файла:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
  * Утка по-пекински
@@ -532,10 +526,97 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  * */
 
+
+private class HtmlParserLists(inputName: String, outputName: String, openHtmlTags: Boolean = true) :
+    HtmlParser(inputName, outputName, openHtmlTags) {
+
+    private val listToggles = Stack<Toggle>()
+    private val liToggles = Stack<Toggle>()
+    private var prevTag = ""
+
+    private fun decreaseStackOl(i: Int) {
+        for (p in 0 until i) {
+            add(liToggles.pop().toggle())
+            add(listToggles.pop().toggle())
+        }
+        try {
+            add(liToggles.pop().toggle())
+        } catch (e: EmptyStackException) {
+            println("[ERROR] liToggles is empty!")
+        }
+
+    }
+
+    override fun close() {
+        decreaseStackOl(listToggles.size)
+        endLine()
+        super.close()
+    }
+
+    override fun parseLine(line: String) {
+
+        fun toggleTag(tag: String) {
+            val spacesAmount = line.takeWhile { it == ' ' }.length
+            val elements = when (tag) {
+                "ol" -> line.trim().split("""\d+\.""".toRegex())
+                "ul" -> line.trim().split("* ")
+                else -> throw IllegalArgumentException("Tag $tag not specified")
+            }
+            val content = elements.subList(1, elements.size).joinToString("")
+            val expectedSpaces = (listToggles.size - 1) * 4
+            if (spacesAmount % 4 == 0)
+                when (expectedSpaces) {
+                    spacesAmount -> {
+                        add(liToggles.pop().toggle()) // close prev </li>
+                        if (prevTag != "" && prevTag != tag) {
+                            add(listToggles.pop().toggle())
+                            listToggles.add(Toggle(tag))
+                            add(listToggles.peek().toggle())
+                        }
+                        liToggles.add(Toggle("li")) // create new
+                        add(liToggles.peek().toggle()) // open new <li>
+                        add(content)
+                    }
+                    in Int.MIN_VALUE..spacesAmount -> {
+                        listToggles.add(Toggle(tag))
+                        add(listToggles.peek().toggle()) // open new <tag>
+                        liToggles.add(Toggle("li"))
+                        add(liToggles.peek().toggle()) // open new <li>
+                        add(content) // write content
+                    }
+                    else -> {
+                        decreaseStackOl((expectedSpaces - spacesAmount) / 4)
+                        liToggles.add(Toggle("li"))
+                        add(liToggles.peek().toggle())
+                        add(content)
+                    }
+
+                }
+            prevTag = tag
+        }
+
+        var matches = """[^\*]?\*[^\*]""".toRegex().findAll(line).count()
+
+        when {
+            line.matches(""" *\d+\. +.+""".toRegex()) -> toggleTag("ol")
+            line.matches(""" *\* .*""".toRegex()) &&
+                    """((?<![\*])|(?<=\*\*))\*(?=[^\*])""".toRegex().findAll("$line ")
+                        .count() % 2 == 1 -> toggleTag("ul")
+            line.isBlank() && listToggles.size > 0 -> {
+                decreaseStackOl(listToggles.size)
+                newLine()
+            }
+            else -> add(line)
+        }
+    }
+
+}
+
 fun markdownToHtmlLists(inputName: String, outputName: String) {
     val htmlParser = HtmlParserLists(inputName, outputName)
     htmlParser.start()
     htmlParser.parseToOutput()
+    htmlParser.close()
 }
 
 /**
@@ -548,12 +629,15 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
  */
 
 fun markdownToHtml(inputName: String, outputName: String) {
-    var htmlParser: HtmlParser = HtmlParserLists(inputName, "myOutputFile.txt")
+    var htmlParser: HtmlParser = HtmlParserLists(inputName, "myOutputFile.txt", false)
     htmlParser.start()
     htmlParser.parseToOutput()
+    htmlParser.close()
 
     htmlParser = HtmlParserSimple("myOutputFile.txt", outputName)
+    htmlParser.start()
     htmlParser.parseToOutput()
+    htmlParser.close()
 }
 
 /**
