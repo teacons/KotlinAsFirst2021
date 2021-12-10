@@ -337,10 +337,13 @@ private abstract class HtmlParser(var inputName: String, outputName: String, val
     }
 
     fun parseToOutput() {
+
         val lines = File(inputName).bufferedReader().lines()
+        var count = 0
         for (line in lines) {
             parseLine(line)
             newLine()
+            count++
         }
         File(inputName).bufferedReader().close()
     }
@@ -377,7 +380,7 @@ private abstract class HtmlParser(var inputName: String, outputName: String, val
 
     fun start() {
         if (openHtmlTags)
-            write("<html><body>")
+            write("<html><body>" + paragraphToggle.toggle())
     }
 
     open fun close() {

@@ -254,37 +254,37 @@ Basic, Ruby, Swift.
     }
 
     private fun check() {
-        markdownToHtmlLists("test/lesson7/task1/input_8.txt", "test/lesson7/task1/output_8.html")
-//        File("test/lesson7/task1/expected_8.txt").bufferedReader().use { expected ->
-//            File("test/lesson7/task1/output_8.txt").bufferedReader().use { output ->
-//                var line = ""
-//                var pos = 0
-//                while (true) {
-//                    val expectedChar = expected.read()
-//                    val outputChar = output.read()
-//                    if (expectedChar == -1 && outputChar == -1)
-//                        return
-//                    if (expectedChar != outputChar)
-//                        throw Exception("Expected: ${expectedChar.toChar()}, got: ${outputChar.toChar()};\nIn line ${line}; \npos $pos")
-//
-//                    if (expectedChar != '\n'.code) {
-//                        line += expectedChar.toChar()
-//                        pos++
-//                    } else {
-//                        line = ""
-//                        pos = 0
-//                    }
-//
-//                }
-//
-//            }
-//        }
+        markdownToHtmlSimple("test/lesson7/task1/input_9.txt", "test/lesson7/task1/output_9.html")
+        File("test/lesson7/task1/expected_9.txt").bufferedReader().use { expected ->
+            File("test/lesson7/task1/output_9.html").bufferedReader().use { output ->
+                var line = ""
+                var pos = 0
+                while (true) {
+                    val expectedChar = expected.read()
+                    val outputChar = output.read()
+                    if (expectedChar == -1 && outputChar == -1)
+                        return
+                    if (expectedChar != outputChar)
+                        throw Exception("Expected: ${expectedChar.toChar()}, got: ${outputChar.toChar()};\nIn line ${line}; \npos $pos")
+
+                    if (expectedChar != '\n'.code) {
+                        line += expectedChar.toChar()
+                        pos++
+                    } else {
+                        line = ""
+                        pos = 0
+                    }
+
+                }
+
+            }
+        }
     }
 
     @Test
     @Tag("22")
     fun markdownToHtmlSimple() {
-//        check()
+        check()
         markdownToHtmlSimple("input/markdown_simple.md", "temp.html")
         checkHtmlSimpleExample()
     }
