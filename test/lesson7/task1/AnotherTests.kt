@@ -2,9 +2,11 @@ package lesson7.task1
 
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.io.File
 
+@Tag("AnotherTest")
 internal class AnotherTests {
 
     @Test
