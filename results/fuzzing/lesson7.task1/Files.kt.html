@@ -406,11 +406,11 @@ fun String.count(offset: Int, str: String): Int {
 <span class="fc bfc" id="L406" title="All 2 branches covered.">        while (i &lt; line.length) {</span>
 <span class="fc" id="L407">            when (line[i]) {</span>
 <span class="fc bfc" id="L408" title="All 2 branches covered.">                '~' -&gt; {</span>
-<span class="pc bpc" id="L409" title="2 of 4 branches missed.">                    if (i + 1 &lt; line.length &amp;&amp; line[i + 1] == '~') { // ~~</span>
+<span class="pc bpc" id="L409" title="1 of 4 branches missed.">                    if (i + 1 &lt; line.length &amp;&amp; line[i + 1] == '~') { // ~~</span>
 <span class="fc" id="L410">                        add(crossToggle.toggle())</span>
 <span class="fc" id="L411">                        i++</span>
                     } else {
-<span class="nc" id="L413">                        add(line[i].toString())</span>
+<span class="fc" id="L413">                        add(line[i].toString())</span>
                     }
                 }
 <span class="fc bfc" id="L416" title="All 2 branches covered.">                '*' -&gt; {</span>

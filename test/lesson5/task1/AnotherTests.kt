@@ -11,131 +11,162 @@ internal class AnotherTests {
 
     @Test
     fun findSumOfTwo() {
+        assertAll(
 //      Проверка ожидаемого входа
-        assertEquals(
-            2 to 4,
-            findSumOfTwo(
-                listOf(1, 22, 44, 33, 20),
-                64
-            )
-        )
-
-        assertEquals(
-            0 to 4,
-            findSumOfTwo(
-                listOf(1, 22, 44, 33, 20),
-                21
-            )
-        )
-
-        assertEquals(
-            2 to 3,
-            findSumOfTwo(
-                listOf(1, 22, 44, 33, 20),
-                77
-            )
-        )
-
-        assertEquals(
-            0 to 4,
-            findSumOfTwo(
-                listOf(1, 22, 44, 33, 20),
-                21
-            )
-        )
-
-        repeat(15) {
-            val generated = generateRandomListAndNumberAndExpected()
-            println("Generated №${it + 1}:")
-            println("list: ${generated.first}")
-            println("number: ${generated.second}")
-            println("expected: ${generated.third}")
-            assertEquals(
-                generated.third,
-                findSumOfTwo(
-                    generated.first,
-                    generated.second
+            {
+                assertEquals(
+                    2 to 4,
+                    findSumOfTwo(
+                        listOf(1, 22, 44, 33, 20),
+                        64
+                    )
                 )
-            )
-        }
+            },
+
+            {
+                assertEquals(
+                    0 to 4,
+                    findSumOfTwo(
+                        listOf(1, 22, 44, 33, 20),
+                        21
+                    )
+                )
+            },
+
+            {
+                assertEquals(
+                    2 to 3,
+                    findSumOfTwo(
+                        listOf(1, 22, 44, 33, 20),
+                        77
+                    )
+                )
+            },
+
+            {
+                assertEquals(
+                    0 to 4,
+                    findSumOfTwo(
+                        listOf(1, 22, 44, 33, 20),
+                        21
+                    )
+                )
+            },
+
+            {
+                repeat(15) {
+                    val generated = generateRandomListAndNumberAndExpected()
+                    println("Generated №${it + 1}:")
+                    println("list: ${generated.first}")
+                    println("number: ${generated.second}")
+                    println("expected: ${generated.third}")
+                    assertEquals(
+                        generated.third,
+                        findSumOfTwo(
+                            generated.first,
+                            generated.second
+                        )
+                    )
+                }
+            },
 
 
 //      Проверка составления пар
-        assertTrue(
-            findSumOfTwo(
-                listOf(1, 1, 1),
-                2
-            ) in listOf(0 to 1, 0 to 2, 1 to 2)
-        )
+            {
+                assertTrue(
+                    findSumOfTwo(
+                        listOf(1, 1, 1),
+                        2
+                    ) in listOf(0 to 1, 0 to 2, 1 to 2)
+                )
+            },
 
-        assertTrue(
-            findSumOfTwo(
-                listOf(0, 0, 0),
-                0
-            ) in listOf(0 to 1, 0 to 2, 1 to 2)
-        )
+            {
+                assertTrue(
+                    findSumOfTwo(
+                        listOf(0, 0, 0),
+                        0
+                    ) in listOf(0 to 1, 0 to 2, 1 to 2)
+                )
+            },
 
-        assertTrue(
-            findSumOfTwo(
-                listOf(Int.MAX_VALUE / 2, Int.MAX_VALUE / 2, Int.MAX_VALUE / 2),
-                (Int.MAX_VALUE / 2) * 2
-            ) in listOf(0 to 1, 0 to 2, 1 to 2)
-        )
+            {
+                assertTrue(
+                    findSumOfTwo(
+                        listOf(Int.MAX_VALUE / 2, Int.MAX_VALUE / 2, Int.MAX_VALUE / 2),
+                        (Int.MAX_VALUE / 2) * 2
+                    ) in listOf(0 to 1, 0 to 2, 1 to 2)
+                )
+            },
 
 //      Проверка отсутствующего результата
-        assertEquals(
-            -1 to -1,
-            findSumOfTwo(
-                listOf(1, 22, 44, 33, 20),
-                78
-            )
-        )
+            {
+                assertEquals(
+                    -1 to -1,
+                    findSumOfTwo(
+                        listOf(1, 22, 44, 33, 20),
+                        78
+                    )
+                )
+            },
 
-        assertEquals(
-            -1 to -1,
-            findSumOfTwo(
-                listOf(0, 1, 2),
-                10
-            )
-        )
+            {
+                assertEquals(
+                    -1 to -1,
+                    findSumOfTwo(
+                        listOf(0, 1, 2),
+                        10
+                    )
+                )
+            },
 
 //      Проверка пустого списка
-        assertEquals(
-            -1 to -1,
-            findSumOfTwo(
-                emptyList(),
-                10
-            )
-        )
+            {
+                assertEquals(
+                    -1 to -1,
+                    findSumOfTwo(
+                        emptyList(),
+                        10
+                    )
+                )
+            },
 
 //      Проверка дублирования индексов
-        assertEquals(
-            -1 to -1,
-            findSumOfTwo(
-                listOf(1, 2, 3),
-                2
-            )
-        )
+            {
+                assertEquals(
+                    -1 to -1,
+                    findSumOfTwo(
+                        listOf(1, 2, 3),
+                        2
+                    )
+                )
+            },
 
-        assertEquals(
-            -1 to -1,
-            findSumOfTwo(
-                listOf(1000, 2000, 3000),
-                2000
-            )
-        )
+            {
+                assertEquals(
+                    -1 to -1,
+                    findSumOfTwo(
+                        listOf(1000, 2000, 3000),
+                        2000
+                    )
+                )
+            },
 
-        assertEquals(
-            0 to 1,
-            findSumOfTwo(
-                listOf(5, 15, 20),
-                20
-            )
-        )
+            {
+                assertEquals(
+                    0 to 1,
+                    findSumOfTwo(
+                        listOf(5, 15, 20),
+                        20
+                    )
+                )
+            },
 
 //      Проверка списка с отрицательными числами (поведение не задано в задании, поэтому ждем Exception)
-        val inputNegativeList = List(Random.nextInt(0, 25)) { Random.nextInt(Int.MIN_VALUE, 0) }
-        assertThrows(Exception::class.java) { findSumOfTwo(inputNegativeList, 25) }
+            {
+                val inputNegativeList = List(Random.nextInt(0, 25)) { Random.nextInt(Int.MIN_VALUE, 0) }
+                assertThrows(Exception::class.java) { findSumOfTwo(inputNegativeList, 25) }
+            })
 
     }
 
@@ -157,74 +188,97 @@ internal class AnotherTests {
 
     @Test
     fun hasAnagrams() {
+        assertAll(
 //      Проверка работы на нормальных данных
-        assertTrue(
-            hasAnagrams(
-                listOf("колба", "бокал", "инвалид")
-            )
-        )
+            {
+                assertTrue(
+                    hasAnagrams(
+                        listOf("колба", "бокал", "инвалид")
+                    )
+                )
+            },
 
-        assertTrue(
-            hasAnagrams(
-                listOf("клоун", "уклон", "апельсин", "яблоко")
-            )
-        )
+            {
+                assertTrue(
+                    hasAnagrams(
+                        listOf("клоун", "уклон", "апельсин", "яблоко")
+                    )
+                )
+            },
 
-        assertTrue(
-            hasAnagrams(
-                listOf("приказ", "каприз", "чучело", "матрос", "больница")
-            )
-        )
+            {
+                assertTrue(
+                    hasAnagrams(
+                        listOf("приказ", "каприз", "чучело", "матрос", "больница")
+                    )
+                )
+            },
 
-        assertFalse(
-            hasAnagrams(
-                listOf("чучело", "матрос", "больница")
-            )
-        )
+            {
+                assertFalse(
+                    hasAnagrams(
+                        listOf("чучело", "матрос", "больница")
+                    )
+                )
+            },
 
 //      Проверка работы с разным регистром
-        assertTrue(
-            hasAnagrams(
-                listOf("КоЛбА", "БОкал", "инВАЛид")
-            )
-        )
+            {
+                assertTrue(
+                    hasAnagrams(
+                        listOf("КоЛбА", "БОкал", "инВАЛид")
+                    )
+                )
+            },
 
-        assertTrue(
-            hasAnagrams(
-                listOf("клОун", "Уклон", "апелЬСИН", "яблОКО")
-            )
-        )
+            {
+                assertTrue(
+                    hasAnagrams(
+                        listOf("клОун", "Уклон", "апелЬСИН", "яблОКО")
+                    )
+                )
+            },
 
-        assertTrue(
-            hasAnagrams(
-                listOf("Приказ", "Каприз", "Чучело", "Матрос", "Больница")
-            )
-        )
+            {
+                assertTrue(
+                    hasAnagrams(
+                        listOf("Приказ", "Каприз", "Чучело", "Матрос", "Больница")
+                    )
+                )
+            },
 
 //      Проверка работы с символами
-        assertTrue(
-            hasAnagrams(
-                listOf("123!@#", "#@!321", "!@#$%^&*()")
-            )
-        )
+            {
+                assertTrue(
+                    hasAnagrams(
+                        listOf("123!@#", "#@!321", "!@#$%^&*()")
+                    )
+                )
+            },
 
-        assertTrue(
-            hasAnagrams(
-                listOf("1", "1", "!")
-            )
-        )
+            {
+                assertTrue(
+                    hasAnagrams(
+                        listOf("1", "1", "!")
+                    )
+                )
+            },
 
 //      Проверка недостаточной размерности списка
-        assertFalse(
-            hasAnagrams(
-                listOf("инвалид")
-            )
-        )
+            {
+                assertFalse(
+                    hasAnagrams(
+                        listOf("инвалид")
+                    )
+                )
+            },
 
-        assertFalse(
-            hasAnagrams(
-                emptyList()
-            )
-        )
+            {
+                assertFalse(
+                    hasAnagrams(
+                        emptyList()
+                    )
+                )
+            })
     }
 }
